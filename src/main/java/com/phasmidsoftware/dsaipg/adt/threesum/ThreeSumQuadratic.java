@@ -6,6 +6,7 @@ package com.phasmidsoftware.dsaipg.adt.threesum;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 
 /**
@@ -48,9 +49,24 @@ public class ThreeSumQuadratic implements ThreeSum {
      * @return a Triple such that
      */
      List<Triple> getTriples(int j) {
-         List<Triple> triples = new ArrayList<>();
+        List<Triple> triples = new ArrayList<>();
         // TO BE IMPLEMENTED  : for each candidate, test if a[i] + a[j] + a[k] = 0.
-throw new RuntimeException("implementation missing");
+        // track the number that we have seen so far
+        HashSet<Integer> set = new HashSet<>();
+        for (int i = 0; i < this.a.length; i++) {
+            // skip origin number
+            if (i != j) {
+                // calculate target
+                int target = -(this.a[j] + this.a[i]);
+                // guarantee the origin number is middle value
+                if ((target * this.a[i] < 0 || this.a[j] == 0) && set.contains(target)) {
+                    triples.add(new Triple(Math.min(target, this.a[i]), this.a[j], Math.max(this.a[i], target)));
+                }
+                set.add(this.a[i]);
+            }
+        }
+         return triples;
+        // throw new RuntimeException("implementation missing");
     }
 
     private final int[] a;
