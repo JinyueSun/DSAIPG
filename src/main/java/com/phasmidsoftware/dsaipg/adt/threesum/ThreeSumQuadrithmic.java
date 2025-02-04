@@ -64,8 +64,8 @@ class ThreeSumQuadrithmic implements ThreeSum {
         // TO BE IMPLEMENTED  : use binary search to find the third element
         // calculate the target
         int target = -(this.a[i] + this.a[j]);
-        int left = j, right = this.a.length - 1;
-        while (left < right) {
+        int left = j + 1, right = this.a.length - 1;
+        while (left <= right) {
             int mid = left + (right - left) / 2;
             if (this.a[mid] < target) {
                 left = mid + 1;

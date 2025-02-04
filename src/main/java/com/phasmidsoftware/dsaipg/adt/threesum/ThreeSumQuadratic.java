@@ -59,7 +59,8 @@ public class ThreeSumQuadratic implements ThreeSum {
                 // calculate target
                 int target = -(this.a[j] + this.a[i]);
                 // guarantee the origin number is middle value
-                if ((target * this.a[i] < 0 || this.a[j] == 0) && set.contains(target)) {
+                if ((this.a[j] == 0 || (target >= this.a[j] && this.a[i] <= this.a[j])
+                        || (target <= this.a[j] && this.a[i] >= this.a[j])) && set.contains(target)) {
                     triples.add(new Triple(Math.min(target, this.a[i]), this.a[j], Math.max(this.a[i], target)));
                 }
                 set.add(this.a[i]);
