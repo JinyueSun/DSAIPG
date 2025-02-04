@@ -4,13 +4,24 @@
 
 package com.phasmidsoftware.dsaipg.adt.threesum;
 
+import com.google.common.base.Stopwatch;
 import com.phasmidsoftware.dsaipg.util.Benchmark_Timer;
 import com.phasmidsoftware.dsaipg.util.TimeLogger;
 import com.phasmidsoftware.dsaipg.util.Utilities;
 
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.text.DateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+
+import static java.time.temporal.ChronoUnit.NANOS;
 
 /**
  * The ThreeSumBenchmark class provides a framework for evaluating and comparing
@@ -62,6 +73,7 @@ public class ThreeSumBenchmark {
      */
     public void runBenchmarks() {
         System.out.println("ThreeSumBenchmark: N=" + n);
+        ThreeSumBenchmark.numberList.add(n);
         benchmarkThreeSum("ThreeSumQuadratic", (xs) -> new ThreeSumQuadratic(xs).getTriples(), n, timeLoggersQuadratic);
         benchmarkThreeSum("ThreeSumQuadrithmic", (xs) -> new ThreeSumQuadrithmic(xs).getTriples(), n, timeLoggersQuadrithmic);
         benchmarkThreeSum("ThreeSumCubic", (xs) -> new ThreeSumCubic(xs).getTriples(), n, timeLoggersCubic);
@@ -78,13 +90,28 @@ public class ThreeSumBenchmark {
      * @param args command-line arguments (not used in this application).
      */
     public static void main(String[] args) {
-        new ThreeSumBenchmark(100, 250, 250).runBenchmarks();
-        new ThreeSumBenchmark(50, 500, 500).runBenchmarks();
-        new ThreeSumBenchmark(20, 1000, 1000).runBenchmarks();
+        new ThreeSumBenchmark(10, 250, 250).runBenchmarks();
+        new ThreeSumBenchmark(10, 500, 500).runBenchmarks();
+        new ThreeSumBenchmark(10, 1000, 1000).runBenchmarks();
         new ThreeSumBenchmark(10, 2000, 2000).runBenchmarks();
         new ThreeSumBenchmark(5, 4000, 4000).runBenchmarks();
         new ThreeSumBenchmark(3, 8000, 8000).runBenchmarks();
         new ThreeSumBenchmark(2, 16000, 16000).runBenchmarks();
+        for (Integer num : ThreeSumBenchmark.numberList) {
+            System.out.print(num + " ");
+        }
+        System.out.println();
+        for (Double value : ThreeSumBenchmark.timeListQuadratic) {
+            System.out.print(value + " ");
+        }
+        System.out.println();
+        for (Double value : ThreeSumBenchmark.timeListQuadrithmic) {
+            System.out.print(value + " ");
+        }
+        System.out.println();
+        for (Double value : ThreeSumBenchmark.timeListCubic) {
+            System.out.print(value + " ");
+        }
     }
 
     /**
@@ -102,8 +129,36 @@ public class ThreeSumBenchmark {
      */
     private void benchmarkThreeSum(final String description, final Consumer<int[]> function, int n, final TimeLogger[] timeLoggers) {
         if (description.equals("ThreeSumCubic") && n > 4000) return;
-        // TO BE IMPLEMENTED 
-throw new RuntimeException("implementation missing");
+        // TO BE IMPLEMENTED
+        long time = 0;
+        long ratio = 0;
+        for (int i = 0; i < this.runs; i++) {
+            Stopwatch stopWatch = Stopwatch.createStarted();
+            //double timeStart = (double)System.currentTimeMillis();
+            function.accept(this.supplier.get());
+            //double timeEnd = (double)System.currentTimeMillis();
+            stopWatch.stop();
+//            System.out.println(stopWatch.elapsed());
+//            System.out.println(stopWatch.elapsed(TimeUnit.MILLISECONDS));
+            time += timeLoggers[0].log(description, stopWatch.elapsed(TimeUnit.MILLISECONDS), this.n);
+            ratio += timeLoggers[1].log(description, stopWatch.elapsed(TimeUnit.MILLISECONDS), this.n);
+        }
+        // store avg time and ratio
+        double avgTime = (double)time / this.runs;
+        switch (description) {
+            case "ThreeSumQuadratic" :
+                ThreeSumBenchmark.timeListQuadratic.add(avgTime);
+            case "ThreeSumQuadrithmic" :
+                ThreeSumBenchmark.timeListQuadrithmic.add(avgTime);
+            case "ThreeSumCubic" :
+                ThreeSumBenchmark.timeListCubic.add(avgTime);
+        }
+
+//        System.out.println("Final Result:" + this.runs);
+//        timeLoggers[0].log(description, time / this.runs, this.n);
+//        timeLoggers[1].log(description, ratio / this.runs, this.n);
+
+        //throw new RuntimeException("implementation missing");
     }
 
     /**
@@ -146,6 +201,11 @@ throw new RuntimeException("implementation missing");
             new TimeLogger("Normalized time per run (n^2): ", n -> 1.0 / 2 * n * n)
     };
 
+    public static ArrayList<Double> timeListQuadratic = new ArrayList<>();
+    public static ArrayList<Double> timeListQuadrithmic = new ArrayList<>();
+    public static ArrayList<Double> timeListCubic = new ArrayList<>();
+
+    public static ArrayList<Integer> numberList = new ArrayList<>();
     private final int runs;
     private final Supplier<int[]> supplier;
     private final int n;

@@ -23,9 +23,10 @@ public class TimeLogger {
      * @param time        the raw time.
      * @param N           the size of the problem.
      */
-    public void log(String description, double time, int N) {
+    public double log(String description, double time, int N) {
         double t = minimumComparisons == null ? time : time / minimumComparisons.apply(N) * 1e6;
         logger.info(description + ": " + prefix + " " + formatTime(t));
+        return t;
     }
 
     /**
