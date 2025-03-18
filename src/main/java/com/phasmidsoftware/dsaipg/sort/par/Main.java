@@ -78,8 +78,15 @@ public class Main {
         if (x.equalsIgnoreCase("N")) setConfig(x, Integer.parseInt(y));
         else
             // TODO sort this out
-            if (x.equalsIgnoreCase("P")) //noinspection ResultOfMethodCallIgnored
-                ForkJoinPool.getCommonPoolParallelism();
+            if (x.equalsIgnoreCase("-P")) //noinspection ResultOfMethodCallIgnored
+                //ForkJoinPool.getCommonPoolParallelism();
+                try {
+                    int numThreads = Integer.parseInt(y);
+                    System.setProperty("java.util.concurrent.ForkJoinPool.common.parallelism", String.valueOf(numThreads));
+                    System.out.println("Updated ForkJoinPool parallelism to " + numThreads);
+                } catch (NumberFormatException e) {
+                    System.err.println("Invalid thread count: " + y);
+                }
     }
 
     private static void setConfig(String x, int i) {

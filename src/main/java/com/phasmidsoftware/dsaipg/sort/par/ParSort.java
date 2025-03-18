@@ -39,10 +39,13 @@ final class ParSort {
      * @param to    the ending index (exclusive) of the portion of the array to be sorted
      */
     public static void sort(int[] array, int from, int to) {
+//        if (from >= to || from < 0 || to > array.length) return;
         if (to - from >= cutoff) {
             CompletableFuture<int[]> completableFuture1 = null;
             CompletableFuture<int[]> completableFuture2 = null;
-            // TO BE IMPLEMENTED 
+            // TO BE IMPLEMENTED
+            completableFuture1 = asyncSort(array, from, from + (to - from + 1) / 2);
+            completableFuture2 = asyncSort(array, from + (to - from + 1) / 2, to);
             // END SOLUTION
             CompletableFuture<int[]> completableFuture = completableFuture1.thenCombine(completableFuture2, ParSort::doMerge);
             completableFuture.whenComplete((result, throwable) -> System.arraycopy(result, 0, array, from, result.length));
@@ -62,8 +65,16 @@ final class ParSort {
      * @return a new sorted array containing the elements from the specified range of the input array
      */
     static int[] sortRecursive(int[] array, int from, int to) {
+//        if (from >= to || from < 0 || to > array.length) return new int[0];
         int[] result = new int[to - from];
-        // TO BE IMPLEMENTED 
+        result = Arrays.copyOfRange(array, from, to);
+        // TO BE IMPLEMENTED
+        if (to - from <= cutoff) {
+            Arrays.sort(result);
+            return result;
+        }
+
+        result = doMerge(sortRecursive(array, from, from + (to - from + 1) / 2), sortRecursive(array, from + (to - from + 1) / 2, to));
          // NOTE you need to do something here so that result is the sorted version of array.
         // END SOLUTION
         return result;
@@ -102,6 +113,7 @@ final class ParSort {
      * @return a CompletableFuture containing the sorted section of the array
      */
     static CompletableFuture<int[]> asyncSort(int[] array, int from, int to) {
+//        if (from >= to || from < 0 || to > array.length) return CompletableFuture.completedFuture(new int[0]);
         return CompletableFuture.supplyAsync(
                 () -> sortRecursive(array, from, to)
         );
