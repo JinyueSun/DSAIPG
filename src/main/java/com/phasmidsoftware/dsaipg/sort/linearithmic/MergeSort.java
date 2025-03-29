@@ -72,13 +72,24 @@ public class MergeSort<X extends Comparable<X>> extends SortWithComparableHelper
         Config config = helper.getConfig();
         boolean insurance = config.getBoolean(MERGESORT, INSURANCE);
         boolean noCopy = config.getBoolean(MERGESORT, NOCOPY);
-        if (to <= from + helper.cutoff()) { // XXX check that a cutoff value of 1 effectively stops the cutoff mechanism.
+
+        if (to <= from + helper.cutoff()) {
             insertionSort.sort(a, from, to);
             return;
         }
 
-        // TO BE IMPLEMENTED  : implement merge sort with insurance and no-copy optimizations
-throw new RuntimeException("implementation missing");
+        int mid = from + (to - from) / 2;
+
+        //
+        sort(aux, a, from, mid);  //
+        sort(aux, a, mid, to);
+
+        if (insurance && !helper.less(aux[mid], aux[mid - 1])) {
+            System.arraycopy(aux, from, a, from, to - from);
+            return;
+        }
+
+        merge(aux, a, from, mid, to);
     }
 
     // CONSIDER combine with MergeSortBasic, perhaps.
